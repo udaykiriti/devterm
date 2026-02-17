@@ -1,10 +1,10 @@
 # devdash
 
-> A terminal-first developer dashboard.
+Terminal-first developer productivity dashboard with a btop-inspired UI.
 
-**devdash** aggregates your development workflow into a single TUI screen, monitoring system metrics, git status, Docker containers, AWS instances, and GitHub PRs with a btop-inspired interface.
+Aggregates system metrics, git status, Docker containers, AWS instances, and GitHub PRs into a single screen.
 
-## Quick Start
+## Usage
 
 ```bash
 cargo run
@@ -12,10 +12,10 @@ cargo run
 
 ## Documentation
 
-- [Features](docs/FEATURES.md)
-- [Configuration](docs/CONFIGURATION.md)
-- [Changelog](docs/CHANGELOG.md)
+* [Features](docs/FEATURES.md)
+* [Configuration](docs/CONFIGURATION.md)
+* [Changelog](docs/CHANGELOG.md)
 
 ## License
 
-MIT © [Uday Kiriti](https://github.com/udaykiriti)
+MIT
