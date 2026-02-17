@@ -3,7 +3,7 @@ use serde::Deserialize;
 use serde_json::Value;
 use std::process::Stdio;
 use std::sync::{Mutex, OnceLock};
-use sysinfo::{ProcessesToUpdate, System};
+use sysinfo::{Disks, Networks, ProcessesToUpdate, System};
 use tokio::process::Command;
 
 use crate::config::Config;
@@ -106,33 +106,52 @@ async fn collect_git(cfg: &Config) -> GitStatus {
     status
 }
 
+struct SystemSampler {
+    sys: System,
+    disks: Disks,
+    networks: Networks,
+}
+
 async fn collect_system() -> SystemStatus {
-    static SAMPLER: OnceLock<Mutex<System>> = OnceLock::new();
+    static SAMPLER: OnceLock<Mutex<SystemSampler>> = OnceLock::new();
     let sampler = SAMPLER.get_or_init(|| {
         let mut sys = System::new_all();
         sys.refresh_cpu_all();
         sys.refresh_memory();
-        Mutex::new(sys)
+        let disks = Disks::new_with_refreshed_list();
+        let networks = Networks::new_with_refreshed_list();
+        Mutex::new(SystemSampler {
+            sys,
+            disks,
+            networks,
+        })
     });
 
-    let mut sys = match sampler.lock() {
-        Ok(sys) => sys,
+    let mut sampler_guard = match sampler.lock() {
+        Ok(guard) => guard,
         Err(poisoned) => {
             eprintln!("Warning: System sampler mutex poisoned, recovering...");
             poisoned.into_inner()
         }
     };
 
+    let inner = &mut *sampler_guard;
+    let sys = &mut inner.sys;
+    let disks = &mut inner.disks;
+    let networks = &mut inner.networks;
+
     sys.refresh_cpu_usage();
     sys.refresh_memory();
     let _ = sys.refresh_processes(ProcessesToUpdate::All, false);
+    disks.refresh(true);
+    networks.refresh(true);
 
     let load = System::load_average();
     
     // Collect disk information
     let mut disk_total_gb = 0.0;
     let mut disk_used_gb = 0.0;
-    for disk in sysinfo::Disks::new_with_refreshed_list().iter() {
+    for disk in disks.iter() {
         disk_total_gb += disk.total_space() as f64 / 1024.0 / 1024.0 / 1024.0;
         let used = disk.total_space() - disk.available_space();
         disk_used_gb += used as f64 / 1024.0 / 1024.0 / 1024.0;
@@ -141,7 +160,7 @@ async fn collect_system() -> SystemStatus {
     // Collect network information
     let mut network_rx_mb = 0.0;
     let mut network_tx_mb = 0.0;
-    for (_interface_name, network) in sysinfo::Networks::new_with_refreshed_list().iter() {
+    for (_interface_name, network) in networks.iter() {
         network_rx_mb += network.total_received() as f64 / 1024.0 / 1024.0;
         network_tx_mb += network.total_transmitted() as f64 / 1024.0 / 1024.0;
     }
