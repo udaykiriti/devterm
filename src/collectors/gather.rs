@@ -88,7 +88,7 @@ async fn collect_git(cfg: &Config) -> GitStatus {
         if line.len() < 2 {
             continue;
         }
-        
+
         let x = line.as_bytes()[0] as char;
         let y = line.as_bytes()[1] as char;
 
@@ -147,7 +147,7 @@ async fn collect_system() -> SystemStatus {
     networks.refresh(true);
 
     let load = System::load_average();
-    
+
     // Collect disk information
     let mut disk_total_gb = 0.0;
     let mut disk_used_gb = 0.0;
@@ -156,7 +156,7 @@ async fn collect_system() -> SystemStatus {
         let used = disk.total_space() - disk.available_space();
         disk_used_gb += used as f64 / 1024.0 / 1024.0 / 1024.0;
     }
-    
+
     // Collect network information
     let mut network_rx_mb = 0.0;
     let mut network_tx_mb = 0.0;
@@ -164,7 +164,7 @@ async fn collect_system() -> SystemStatus {
         network_rx_mb += network.total_received() as f64 / 1024.0 / 1024.0;
         network_tx_mb += network.total_transmitted() as f64 / 1024.0 / 1024.0;
     }
-    
+
     let mut top_processes = sys
         .processes()
         .values()

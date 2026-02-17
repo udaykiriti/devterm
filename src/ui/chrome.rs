@@ -9,9 +9,9 @@ use ratatui::{
 use crate::app::{App, Pane};
 
 use super::theme::{
-    ACCENT, ACCENT_BRIGHT, BAD, BAD_BRIGHT, BG, BORDER, BORDER_ACTIVE, BORDER_FOCUSED, 
-    GOOD, GOOD_BRIGHT, GLOW, MUTED, PANEL_BG, PANEL_BG_ACTIVE, SECONDARY, TERTIARY, 
-    TEXT, TEXT_DIM, WARN_BRIGHT
+    ACCENT, ACCENT_BRIGHT, BAD, BAD_BRIGHT, BG, BORDER, BORDER_ACTIVE, BORDER_FOCUSED, GLOW, GOOD,
+    GOOD_BRIGHT, MUTED, PANEL_BG, PANEL_BG_ACTIVE, SECONDARY, TERTIARY, TEXT, TEXT_DIM,
+    WARN_BRIGHT,
 };
 
 pub fn render_header(frame: &mut Frame, app: &App, area: Rect) {
@@ -21,38 +21,57 @@ pub fn render_header(frame: &mut Frame, app: &App, area: Rect) {
         .map(|ts| ts.format("%H:%M:%S").to_string())
         .unwrap_or_else(|| "──:──:──".to_string());
 
-    let status_color = if app.loading { WARN_BRIGHT } else { GOOD_BRIGHT };
+    let status_color = if app.loading {
+        WARN_BRIGHT
+    } else {
+        GOOD_BRIGHT
+    };
     let status_text = if app.loading { "[*]" } else { "[+]" };
-    let mode = if app.compact_mode { "compact" } else { "normal" };
+    let mode = if app.compact_mode {
+        "compact"
+    } else {
+        "normal"
+    };
 
     let spinner = spinner_glyph(app.spinner_index);
-    
+
     // Modern header with gradient-style separators
     let mut lines = vec![Line::from(vec![
         Span::styled(
             " [#] ",
-            Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(ACCENT_BRIGHT)
+                .add_modifier(Modifier::BOLD),
         ),
         Span::styled(
             "DEVDASH",
-            Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(ACCENT_BRIGHT)
+                .add_modifier(Modifier::BOLD),
         ),
         Span::styled(
             " [#]",
-            Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(ACCENT_BRIGHT)
+                .add_modifier(Modifier::BOLD),
         ),
         Span::styled("  ", Style::default()),
         Span::styled(
             status_text,
-            Style::default().fg(status_color).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(status_color)
+                .add_modifier(Modifier::BOLD),
         ),
+        Span::styled(format!(" {spinner} "), Style::default().fg(status_color)),
         Span::styled(
-            format!(" {spinner} "),
-            Style::default().fg(status_color),
-        ),
-        Span::styled(
-            if app.loading { "Refreshing..." } else { "Ready" },
-            Style::default().fg(status_color).add_modifier(Modifier::BOLD),
+            if app.loading {
+                "Refreshing..."
+            } else {
+                "Ready"
+            },
+            Style::default()
+                .fg(status_color)
+                .add_modifier(Modifier::BOLD),
         ),
         Span::styled("   ", Style::default()),
         Span::styled("/ ", Style::default().fg(BORDER)),
@@ -96,7 +115,9 @@ pub fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
         let cmd = Paragraph::new(Line::from(vec![
             Span::styled(
                 "> ",
-                Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD),
+                Style::default()
+                    .fg(ACCENT_BRIGHT)
+                    .add_modifier(Modifier::BOLD),
             ),
             Span::styled(app.command_input.clone(), Style::default().fg(TEXT)),
             Span::styled("|", Style::default().fg(ACCENT_BRIGHT)),
@@ -141,7 +162,12 @@ pub fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
 
     let mut spans = vec![
         Span::styled("  ", Style::default()),
-        Span::styled(">", Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD)),
+        Span::styled(
+            ">",
+            Style::default()
+                .fg(ACCENT_BRIGHT)
+                .add_modifier(Modifier::BOLD),
+        ),
         Span::styled(" Palette  ", Style::default().fg(TEXT_DIM)),
         Span::styled("[Tab] ", Style::default().fg(SECONDARY)),
         Span::styled("Cycle  ", Style::default().fg(TEXT_DIM)),
@@ -157,7 +183,10 @@ pub fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
 
     if let Some(err) = &app.last_error {
         spans.push(Span::styled("    //  ", Style::default().fg(BORDER)));
-        spans.push(Span::styled("[!] ", Style::default().fg(BAD_BRIGHT).add_modifier(Modifier::BOLD)));
+        spans.push(Span::styled(
+            "[!] ",
+            Style::default().fg(BAD_BRIGHT).add_modifier(Modifier::BOLD),
+        ));
         spans.push(Span::styled(err, Style::default().fg(WARN_BRIGHT)));
     } else if let Some(msg) = &app.status {
         spans.push(Span::styled("    //  ", Style::default().fg(BORDER)));
@@ -181,16 +210,14 @@ pub fn render_footer(frame: &mut Frame, app: &App, area: Rect) {
 pub fn pane_block(title: &str, selected: bool) -> Block<'_> {
     let (border_style, bg, btype) = if selected {
         (
-            Style::default().fg(BORDER_FOCUSED).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(BORDER_FOCUSED)
+                .add_modifier(Modifier::BOLD),
             PANEL_BG_ACTIVE,
             BorderType::Rounded,
         )
     } else {
-        (
-            Style::default().fg(BORDER),
-            PANEL_BG,
-            BorderType::Rounded,
-        )
+        (Style::default().fg(BORDER), PANEL_BG, BorderType::Rounded)
     };
 
     let title_style = if selected {
@@ -202,10 +229,7 @@ pub fn pane_block(title: &str, selected: bool) -> Block<'_> {
     };
 
     Block::default()
-        .title(Span::styled(
-            format!(" [[ {} ]] ", title),
-            title_style,
-        ))
+        .title(Span::styled(format!(" [[ {} ]] ", title), title_style))
         .title_alignment(Alignment::Center)
         .borders(Borders::ALL)
         .border_type(btype)
@@ -220,16 +244,18 @@ fn build_modern_pane_chips(selected: Pane) -> Vec<Span<'static>> {
         Span::styled(" Panes ", Style::default().fg(TEXT_DIM)),
         Span::styled("] ", Style::default().fg(ACCENT_BRIGHT)),
     ];
-    
+
     for pane in Pane::ALL.iter() {
         let name = pane_name(*pane);
         let icon = pane_icon(*pane);
-        
+
         if *pane == selected {
             spans.push(Span::styled(" / ", Style::default().fg(BORDER)));
             spans.push(Span::styled(
                 icon,
-                Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD),
+                Style::default()
+                    .fg(ACCENT_BRIGHT)
+                    .add_modifier(Modifier::BOLD),
             ));
             spans.push(Span::styled(
                 format!(" {name}"),
@@ -238,7 +264,10 @@ fn build_modern_pane_chips(selected: Pane) -> Vec<Span<'static>> {
         } else {
             spans.push(Span::styled(" / ", Style::default().fg(BORDER)));
             spans.push(Span::styled(icon, Style::default().fg(MUTED)));
-            spans.push(Span::styled(format!(" {name}"), Style::default().fg(TEXT_DIM)));
+            spans.push(Span::styled(
+                format!(" {name}"),
+                Style::default().fg(TEXT_DIM),
+            ));
         }
     }
     spans.push(Span::styled(" ", Style::default()));
@@ -268,6 +297,8 @@ fn pane_icon(p: Pane) -> &'static str {
 }
 
 fn spinner_glyph(idx: usize) -> &'static str {
-    const GLYPHS: [&str; 10] = ["[|]", "[/]", "[-]", "[\\]", "[|]", "[/]", "[-]", "[\\]", "[|]", "[/]"];
+    const GLYPHS: [&str; 10] = [
+        "[|]", "[/]", "[-]", "[\\]", "[|]", "[/]", "[-]", "[\\]", "[|]", "[/]",
+    ];
     GLYPHS[idx % GLYPHS.len()]
 }

@@ -87,10 +87,7 @@ impl DashboardPlugin for CommandPlugin {
             // Execute with 30-second timeout
             let result = tokio::time::timeout(
                 std::time::Duration::from_secs(30),
-                cmd
-                    .stdout(Stdio::piped())
-                    .stderr(Stdio::piped())
-                    .output()
+                cmd.stdout(Stdio::piped()).stderr(Stdio::piped()).output(),
             )
             .await;
 

@@ -10,8 +10,8 @@ pub fn apply_cache(data: &mut DashboardData, cache: &mut DataCache, cache_second
             cache.aws = Some((data.aws.clone(), now));
         }
         Some(err) => {
-            if let Some((cached, ts)) = &cache.aws 
-                && (now - *ts).num_seconds() <= cache_seconds as i64 
+            if let Some((cached, ts)) = &cache.aws
+                && (now - *ts).num_seconds() <= cache_seconds as i64
             {
                 data.aws.instances = cached.instances.clone();
                 data.aws.items = cached.items.clone();
@@ -26,8 +26,8 @@ pub fn apply_cache(data: &mut DashboardData, cache: &mut DataCache, cache_second
             cache.prs = Some((data.prs.clone(), now));
         }
         Some(err) => {
-            if let Some((cached, ts)) = &cache.prs 
-                && (now - *ts).num_seconds() <= cache_seconds as i64 
+            if let Some((cached, ts)) = &cache.prs
+                && (now - *ts).num_seconds() <= cache_seconds as i64
             {
                 data.prs.open = cached.open.clone();
                 data.prs.items = cached.items.clone();
