@@ -26,7 +26,10 @@ use plugin::PluginManager;
 /// Messages for controlling data collection
 enum ControlMsg {
     RefreshNow,
-    ReloadRuntime { cfg: Config, plugins: PluginManager },
+    ReloadRuntime {
+        cfg: Box<Config>,
+        plugins: Box<PluginManager>,
+    },
 }
 
 /// Main application entry point
@@ -86,8 +89,8 @@ async fn run_app(
                     match cmd {
                         Some(ControlMsg::RefreshNow) => {}
                         Some(ControlMsg::ReloadRuntime { cfg, plugins }) => {
-                            collector_cfg = cfg;
-                            plugin_mgr = plugins;
+                            collector_cfg = *cfg;
+                            plugin_mgr = *plugins;
                             interval = tokio::time::interval(std::time::Duration::from_secs(
                                 collector_cfg.refresh_seconds.max(1),
                             ));
@@ -141,14 +144,14 @@ async fn run_app(
                             }
                         }
                         Event::Mouse(mouse) => {
-                            if matches!(mouse.kind, MouseEventKind::Down(_)) {
-                                if let Ok(size) = terminal.size() {
-                                    let area = Rect::new(0, 0, size.width, size.height);
-                                    if let Some(pane) =
-                                        ui::pane_at(area, &app.layout, mouse.column, mouse.row)
-                                    {
-                                        app.selected = pane;
-                                    }
+                            if matches!(mouse.kind, MouseEventKind::Down(_))
+                                && let Ok(size) = terminal.size()
+                            {
+                                let area = Rect::new(0, 0, size.width, size.height);
+                                if let Some(pane) =
+                                    ui::pane_at(area, &app.layout, mouse.column, mouse.row)
+                                {
+                                    app.selected = pane;
                                 }
                             }
                         }
@@ -311,7 +314,10 @@ async fn execute_palette_command(
                 app.apply_config(&cfg);
                 let plugins = PluginManager::from_config(&cfg.plugins);
                 if ctrl_tx
-                    .send(ControlMsg::ReloadRuntime { cfg, plugins })
+                    .send(ControlMsg::ReloadRuntime {
+                        cfg: Box::new(cfg),
+                        plugins: Box::new(plugins),
+                    })
                     .await
                     .is_err()
                 {

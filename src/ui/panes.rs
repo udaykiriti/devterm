@@ -11,17 +11,22 @@ use crate::app::{App, Pane, SystemLayoutMode};
 
 use super::chrome::pane_block;
 use super::theme::{
-    ACCENT, ACCENT_BRIGHT, BAD, BAD_BRIGHT, GLOW, GOOD, GOOD_BRIGHT, 
-    HIGHLIGHT_BG, MUTED, PANEL_BG_ACTIVE, SECONDARY, TERTIARY, TEXT, TEXT_DIM, WARN, WARN_BRIGHT
+    ACCENT, ACCENT_BRIGHT, BAD, BAD_BRIGHT, GLOW, GOOD, GOOD_BRIGHT, HIGHLIGHT_BG, MUTED,
+    PANEL_BG_ACTIVE, SECONDARY, TERTIARY, TEXT, TEXT_DIM, WARN, WARN_BRIGHT,
 };
 
 pub fn render_git(frame: &mut Frame, app: &App, area: Rect) {
     let git = &app.data.git;
-    
+
     // Modern git status with ASCII art
     let lines = vec![
         Line::from(vec![
-            Span::styled("[G] ", Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[G] ",
+                Style::default()
+                    .fg(ACCENT_BRIGHT)
+                    .add_modifier(Modifier::BOLD),
+            ),
             Span::styled("Branch: ", Style::default().fg(TEXT_DIM)),
             Span::styled(
                 &git.branch,
@@ -37,14 +42,24 @@ pub fn render_git(frame: &mut Frame, app: &App, area: Rect) {
         Line::from(""),
         Line::from(vec![
             Span::styled("  ", Style::default()),
-            Span::styled("[+] ", Style::default().fg(GOOD_BRIGHT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[+] ",
+                Style::default()
+                    .fg(GOOD_BRIGHT)
+                    .add_modifier(Modifier::BOLD),
+            ),
             Span::styled("Staged ", Style::default().fg(TEXT_DIM)),
             Span::styled(
                 format!("{:>3}", git.staged),
                 Style::default().fg(GOOD).add_modifier(Modifier::BOLD),
             ),
             Span::styled("    ", Style::default()),
-            Span::styled("[*] ", Style::default().fg(WARN_BRIGHT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[*] ",
+                Style::default()
+                    .fg(WARN_BRIGHT)
+                    .add_modifier(Modifier::BOLD),
+            ),
             Span::styled("Unstaged ", Style::default().fg(TEXT_DIM)),
             Span::styled(
                 format!("{:>3}", git.unstaged),
@@ -53,7 +68,10 @@ pub fn render_git(frame: &mut Frame, app: &App, area: Rect) {
         ]),
         Line::from(vec![
             Span::styled("  ", Style::default()),
-            Span::styled("[?] ", Style::default().fg(BAD_BRIGHT).add_modifier(Modifier::BOLD)),
+            Span::styled(
+                "[?] ",
+                Style::default().fg(BAD_BRIGHT).add_modifier(Modifier::BOLD),
+            ),
             Span::styled("Untracked ", Style::default().fg(TEXT_DIM)),
             Span::styled(
                 format!("{:>3}", git.untracked),
@@ -171,14 +189,14 @@ pub fn render_system(frame: &mut Frame, app: &App, area: Rect) {
     let rows = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Length(1),  // top line
-            Constraint::Length(7),  // gauges + stats cards (increased for 3 gauges)
-            Constraint::Length(1),  // cpu trend
-            Constraint::Length(1),  // mem trend
-            Constraint::Length(1),  // disk trend (NEW)
-            Constraint::Length(1),  // core meters
-            Constraint::Length(1),  // trend strips
-            Constraint::Length(1),  // process line
+            Constraint::Length(1), // top line
+            Constraint::Length(7), // gauges + stats cards (increased for 3 gauges)
+            Constraint::Length(1), // cpu trend
+            Constraint::Length(1), // mem trend
+            Constraint::Length(1), // disk trend (NEW)
+            Constraint::Length(1), // core meters
+            Constraint::Length(1), // trend strips
+            Constraint::Length(1), // process line
         ])
         .split(inner);
 
@@ -190,10 +208,10 @@ pub fn render_system(frame: &mut Frame, app: &App, area: Rect) {
     let gauges = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Length(2),  // CPU gauge
-            Constraint::Length(2),  // MEM gauge
-            Constraint::Length(2),  // DISK gauge (NEW)
-            Constraint::Length(1),  // effects
+            Constraint::Length(2), // CPU gauge
+            Constraint::Length(2), // MEM gauge
+            Constraint::Length(2), // DISK gauge (NEW)
+            Constraint::Length(1), // effects
         ])
         .split(core[0]);
 
@@ -234,7 +252,7 @@ pub fn render_system(frame: &mut Frame, app: &App, area: Rect) {
         ),
         Span::styled("  [", Style::default().fg(MUTED)),
         Span::styled(
-            format!("{health_label}"),
+            health_label.to_string(),
             Style::default()
                 .fg(health_color)
                 .add_modifier(Modifier::BOLD),
@@ -361,12 +379,16 @@ pub fn render_system(frame: &mut Frame, app: &App, area: Rect) {
             Span::styled("NET RX ", Style::default().fg(MUTED)),
             Span::styled(
                 format!("{:.1}M", sys.network_rx_mb),
-                Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD),
+                Style::default()
+                    .fg(ACCENT_BRIGHT)
+                    .add_modifier(Modifier::BOLD),
             ),
             Span::styled("  TX ", Style::default().fg(MUTED)),
             Span::styled(
                 format!("{:.1}M", sys.network_tx_mb),
-                Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD),
+                Style::default()
+                    .fg(ACCENT_BRIGHT)
+                    .add_modifier(Modifier::BOLD),
             ),
         ]),
         Line::from(vec![
@@ -377,7 +399,7 @@ pub fn render_system(frame: &mut Frame, app: &App, area: Rect) {
             ),
             Span::styled("  [", Style::default().fg(MUTED)),
             Span::styled(
-                format!("{health_label}"),
+                health_label.to_string(),
                 Style::default()
                     .fg(health_color)
                     .add_modifier(Modifier::BOLD),
@@ -593,11 +615,13 @@ pub fn render_plugins(frame: &mut Frame, app: &App, area: Rect) {
         let p = Paragraph::new(vec![
             Line::from(""),
             Line::from(vec![
-                Span::styled("  [X]  ", Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD)),
                 Span::styled(
-                    "No plugins configured",
-                    Style::default().fg(TEXT_DIM),
+                    "  [X]  ",
+                    Style::default()
+                        .fg(ACCENT_BRIGHT)
+                        .add_modifier(Modifier::BOLD),
                 ),
+                Span::styled("No plugins configured", Style::default().fg(TEXT_DIM)),
             ]),
             Line::from(""),
             Line::from(vec![
@@ -629,7 +653,9 @@ pub fn render_plugins(frame: &mut Frame, app: &App, area: Rect) {
                     Span::styled(format!("{icon} "), Style::default().fg(color)),
                     Span::styled(
                         &plugin.name,
-                        Style::default().fg(ACCENT_BRIGHT).add_modifier(Modifier::BOLD),
+                        Style::default()
+                            .fg(ACCENT_BRIGHT)
+                            .add_modifier(Modifier::BOLD),
                     ),
                 ]),
                 Line::from(vec![
@@ -728,12 +754,12 @@ fn pulse_color(base: Color, flash: bool, phase: usize) -> Color {
     if !flash {
         return base;
     }
-    if phase % 2 == 0 {
+    if phase.is_multiple_of(2) {
         match base {
             Color::Rgb(r, g, b) => Color::Rgb(
-                r.saturating_add(25), 
-                g.saturating_add(25), 
-                b.saturating_add(15)
+                r.saturating_add(25),
+                g.saturating_add(25),
+                b.saturating_add(15),
             ),
             _ => ACCENT_BRIGHT,
         }

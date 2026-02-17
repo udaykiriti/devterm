@@ -18,7 +18,7 @@ pub struct Config {
 }
 
 /// AWS integration configuration
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Default)]
 #[serde(default)]
 pub struct AwsConfig {
     pub region: Option<String>,
@@ -73,15 +73,6 @@ impl Default for Config {
             aws: AwsConfig::default(),
             github: GitHubConfig::default(),
             plugins: vec![],
-        }
-    }
-}
-
-impl Default for AwsConfig {
-    fn default() -> Self {
-        Self {
-            region: None,
-            profile: None,
         }
     }
 }
