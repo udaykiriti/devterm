@@ -1,5 +1,4 @@
-devdash is a high-performance terminal dashboard that aggregates system metrics,
-git status, Docker containers, AWS instances, and GitHub PRs into a single,
-btop-inspired TUI.
+A terminal-first developer dashboard for monitoring system health, git repositories,
+container runtimes, and cloud infrastructure in a unified TUI.
 
 Usage: cargo run
