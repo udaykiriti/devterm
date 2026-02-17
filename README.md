@@ -1,21 +1,22 @@
-# devdash
+devdash
+=======
 
-Terminal-first developer productivity dashboard with a btop-inspired UI.
+A terminal-based developer dashboard.
 
-Aggregates system metrics, git status, Docker containers, AWS instances, and GitHub PRs into a single screen.
+It monitors system metrics, git status, Docker containers, AWS instances,
+and GitHub pull requests in a single TUI interface.
 
-## Usage
+Usage
+-----
 
-```bash
-cargo run
-```
+    $ cargo run
 
-## Documentation
+Documentation
+-------------
 
-* [Features](docs/FEATURES.md)
-* [Configuration](docs/CONFIGURATION.md)
-* [Changelog](docs/CHANGELOG.md)
+See the docs/ directory for configuration and features.
 
-## License
+License
+-------
 
 MIT
