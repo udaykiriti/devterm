@@ -158,6 +158,12 @@ The UI uses a carefully crafted color palette inspired by btop and modern termin
 - Enhanced modal dialogs
 - Professional footer with Unicode symbols
 
+### Optimizations & Docs (v0.2.1)
+- **Performance**: Optimized system metric collection by reusing expensive objects
+- **Efficiency**: Reduced CPU overhead in data collection loops
+- **Code Quality**: Added comprehensive documentation for key components
+- **Maintainability**: Refactored cache logic and fixed mutable borrow patterns
+
 ## Requirements
 
 - Rust 1.70+
