@@ -3,6 +3,7 @@ use serde::Deserialize;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+/// Main application configuration
 #[derive(Debug, Clone, Deserialize)]
 #[serde(default)]
 pub struct Config {
@@ -16,6 +17,7 @@ pub struct Config {
     pub plugins: Vec<PluginConfig>,
 }
 
+/// AWS integration configuration
 #[derive(Debug, Clone, Deserialize)]
 #[serde(default)]
 pub struct AwsConfig {
@@ -23,6 +25,7 @@ pub struct AwsConfig {
     pub profile: Option<String>,
 }
 
+/// GitHub integration configuration
 #[derive(Debug, Clone, Deserialize)]
 #[serde(default)]
 pub struct GitHubConfig {
@@ -30,6 +33,7 @@ pub struct GitHubConfig {
     pub token_env: String,
 }
 
+/// System monitoring alert thresholds
 #[derive(Debug, Clone, Deserialize)]
 #[serde(default)]
 pub struct AlertsConfig {
@@ -41,12 +45,14 @@ pub struct AlertsConfig {
     pub stale_crit_secs: f32,
 }
 
+/// UI layout configuration
 #[derive(Debug, Clone, Deserialize)]
 #[serde(default)]
 pub struct SystemUiConfig {
     pub layout_mode: String,
 }
 
+/// Plugin configuration for custom commands
 #[derive(Debug, Clone, Deserialize)]
 #[serde(default)]
 pub struct PluginConfig {
@@ -122,6 +128,7 @@ impl Default for PluginConfig {
 }
 
 impl Config {
+    /// Load configuration from standard locations
     pub fn load() -> Result<Self> {
         let mut candidates = vec![PathBuf::from("devdash.toml")];
 
@@ -141,6 +148,7 @@ impl Config {
         Ok(Self::default())
     }
 
+    /// Load configuration from a specific file path
     pub fn from_file(path: &Path) -> Result<Self> {
         let raw = fs::read_to_string(path)?;
         let cfg = toml::from_str::<Self>(&raw)?;
@@ -148,6 +156,7 @@ impl Config {
         Ok(cfg)
     }
 
+    /// Ensure alert thresholds are logically ordered
     fn validate(&self) -> Result<()> {
         if self.alerts.cpu_warn_pct >= self.alerts.cpu_crit_pct {
             anyhow::bail!(

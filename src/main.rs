@@ -23,11 +23,13 @@ use collectors::{DataCache, apply_cache, collect_all};
 use config::Config;
 use plugin::PluginManager;
 
+/// Messages for controlling data collection
 enum ControlMsg {
     RefreshNow,
     ReloadRuntime { cfg: Config, plugins: PluginManager },
 }
 
+/// Main application entry point
 #[tokio::main]
 async fn main() -> Result<()> {
     let cfg = Config::load()?;
@@ -54,6 +56,7 @@ async fn main() -> Result<()> {
     run_result
 }
 
+/// Main application loop handling UI rendering and event processing
 async fn run_app(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     cfg: Config,
@@ -62,10 +65,12 @@ async fn run_app(
     let mut app = App::new();
     app.apply_config(&cfg);
 
+    // Channels for data updates, loading status, and control messages
     let (data_tx, mut data_rx) = mpsc::channel(8);
     let (status_tx, mut status_rx) = mpsc::channel(8);
     let (ctrl_tx, mut ctrl_rx) = mpsc::channel(8);
 
+    // Background task for periodic data collection
     let mut collector_cfg = cfg.clone();
     let mut plugin_mgr = plugins.clone();
     tokio::spawn(async move {
@@ -157,12 +162,14 @@ async fn run_app(
     Ok(())
 }
 
+/// Handle keyboard input, returns true if app should quit
 async fn handle_key(
     code: KeyCode,
     modifiers: KeyModifiers,
     app: &mut App,
     ctrl_tx: &mpsc::Sender<ControlMsg>,
 ) -> bool {
+    // Handle modal dialog keys
     if app.detail_modal.is_some() {
         match code {
             KeyCode::Esc | KeyCode::Enter | KeyCode::Char('q') => app.close_details(),
@@ -171,10 +178,12 @@ async fn handle_key(
         return false;
     }
 
+    // Handle command palette
     if app.command_mode {
         return handle_command_mode(code, app, ctrl_tx).await;
     }
 
+    // Handle normal navigation and control keys
     match code {
         KeyCode::Char('q') | KeyCode::Esc | KeyCode::F(10) => return true,
         KeyCode::Char(':') => app.enter_command_mode(),
@@ -250,6 +259,7 @@ async fn handle_key(
     false
 }
 
+/// Handle command palette input, returns true if app should quit
 async fn handle_command_mode(
     code: KeyCode,
     app: &mut App,
@@ -281,6 +291,7 @@ async fn handle_command_mode(
     false
 }
 
+/// Execute a parsed command palette command, returns true if app should quit
 async fn execute_palette_command(
     cmd: PaletteCommand,
     app: &mut App,

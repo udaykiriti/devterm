@@ -7,6 +7,7 @@ use tokio::process::Command;
 
 use crate::config::PluginConfig;
 
+/// Plugin output data structure
 #[derive(Debug, Clone, Default)]
 pub struct PluginOutput {
     pub name: String,
@@ -14,17 +15,20 @@ pub struct PluginOutput {
     pub error: Option<String>,
 }
 
+/// Trait for implementing dashboard plugins
 pub trait DashboardPlugin: Send + Sync {
     fn name(&self) -> &str;
     fn collect<'a>(&'a self) -> Pin<Box<dyn Future<Output = PluginOutput> + Send + 'a>>;
 }
 
+/// Manager for running multiple plugins
 #[derive(Clone)]
 pub struct PluginManager {
     plugins: Vec<Arc<dyn DashboardPlugin>>,
 }
 
 impl PluginManager {
+    /// Create plugin manager from configuration
     pub fn from_config(cfgs: &[PluginConfig]) -> Self {
         let mut plugins: Vec<Arc<dyn DashboardPlugin>> = Vec::new();
         for cfg in cfgs {
@@ -36,6 +40,7 @@ impl PluginManager {
         Self { plugins }
     }
 
+    /// Run all plugins and collect their outputs
     pub async fn collect_all(&self) -> Vec<PluginOutput> {
         let mut out = Vec::with_capacity(self.plugins.len());
         for plugin in &self.plugins {
@@ -45,6 +50,7 @@ impl PluginManager {
     }
 }
 
+/// Plugin implementation that executes shell commands
 struct CommandPlugin {
     cfg: PluginConfig,
 }
@@ -62,6 +68,7 @@ impl DashboardPlugin for CommandPlugin {
 
     fn collect<'a>(&'a self) -> Pin<Box<dyn Future<Output = PluginOutput> + Send + 'a>> {
         Box::pin(async move {
+            // Build command with or without shell wrapper
             let mut cmd = if self.cfg.shell {
                 let mut c = Command::new("bash");
                 let joined = if self.cfg.args.is_empty() {
@@ -77,6 +84,7 @@ impl DashboardPlugin for CommandPlugin {
                 c
             };
 
+            // Execute with 30-second timeout
             let result = tokio::time::timeout(
                 std::time::Duration::from_secs(30),
                 cmd
@@ -86,6 +94,7 @@ impl DashboardPlugin for CommandPlugin {
             )
             .await;
 
+            // Parse result and format output
             match result {
                 Ok(Ok(output)) if output.status.success() => {
                     let text = String::from_utf8_lossy(&output.stdout);
